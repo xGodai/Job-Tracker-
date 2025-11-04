@@ -55,6 +55,50 @@ document.addEventListener('DOMContentLoaded', function() {
     } catch (e) {
         // ignore
     }
+
+    // Accessibility helpers: link helpful descriptions and improve modal focus
+    try {
+        // Associate adjacent .form-text hints with input/select/textarea elements
+        document.querySelectorAll('form').forEach(function(form) {
+            var hints = form.querySelectorAll('.form-text');
+            hints.forEach(function(hint, idx) {
+                // Look for an input/select/textarea immediately before the hint
+                var prev = hint.previousElementSibling;
+                if (!prev) return;
+                // If the previous sibling is a label, use its control
+                if (prev.tagName === 'LABEL' && prev.htmlFor) {
+                    var control = form.querySelector('#' + prev.htmlFor);
+                    if (control && !control.hasAttribute('aria-describedby')) {
+                        var hid = 'hint-' + (prev.htmlFor) + (idx);
+                        hint.id = hint.id || hid;
+                        control.setAttribute('aria-describedby', hint.id);
+                    }
+                    return;
+                }
+                // If previous element is an input/select/textarea, attach aria-describedby
+                if (/INPUT|SELECT|TEXTAREA/.test(prev.tagName)) {
+                    var cid = prev.id || (prev.name ? ('input-' + prev.name) : null);
+                    if (!prev.id && cid) prev.id = cid;
+                    var hid2 = hint.id || (cid ? ('hint-' + cid + '-' + idx) : ('hint-' + Date.now() + '-' + idx));
+                    hint.id = hint.id || hid2;
+                    if (!prev.hasAttribute('aria-describedby')) prev.setAttribute('aria-describedby', hint.id);
+                }
+            });
+        });
+
+        // Ensure Bootstrap modals focus the first form control when shown (improves keyboard flow)
+        document.querySelectorAll('.modal').forEach(function(modalEl) {
+            modalEl.addEventListener('shown.bs.modal', function() {
+                try {
+                    var focusable = modalEl.querySelector('input, select, textarea, button, [tabindex]:not([tabindex="-1"])');
+                    if (focusable) focusable.focus();
+                } catch (e) { /* ignore */ }
+            });
+        });
+    } catch (e) {
+        // Non-critical: don't break other scripts
+        console && console.error && console.error('accessibility helpers failed', e);
+    }
 });
 
 // Utility: remove the messages container div if it contains no alert children
