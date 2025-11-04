@@ -19,8 +19,8 @@ class JobApplicationForm(forms.ModelForm):
             'application_date': forms.DateInput(attrs={'type': 'date'}),
             'job_description': forms.Textarea(attrs={'rows': 3}),
             'notes': forms.Textarea(attrs={'rows': 3}),
-            'cv': forms.ClearableFileInput(attrs={'accept': 'application/pdf,.pdf'}),
-            'cover_letter': forms.ClearableFileInput(attrs={'accept': 'application/pdf,.pdf'}),
+            'cv': forms.FileInput(attrs={'accept': 'application/pdf,.pdf'}),
+            'cover_letter': forms.FileInput(attrs={'accept': 'application/pdf,.pdf'}),
         }
     
     def __init__(self, *args, **kwargs):

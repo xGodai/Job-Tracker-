@@ -71,7 +71,8 @@ document.addEventListener('DOMContentLoaded', function() {
             var form = document.getElementById('jobApplicationForm');
             if (!form) return;
 
-            // Reset form controls
+            // Basic reset then aggressively clear values so we don't keep server-rendered
+            // "edit" values as the form's initial values (form.reset() restores initial values).
             try { form.reset(); } catch (e) {}
 
             // Remove edit-specific hidden inputs if present
@@ -99,9 +100,41 @@ document.addEventListener('DOMContentLoaded', function() {
             var errorMsgs = form.querySelectorAll('.text-danger, .invalid-feedback');
             errorMsgs.forEach(function(el) { el.remove(); });
 
-            // If application_date input exists and is empty, set to today (YYYY-MM-DD)
+            // Aggressively clear most form controls so server-rendered "value" attributes
+            // don't persist after reset(). We keep CSRF token and add_job_application hidden input.
+            Array.from(form.elements).forEach(function(el) {
+                if (!el.name) return;
+                if (el.type === 'hidden' && (el.name === 'csrfmiddlewaretoken' || el.name === 'add_job_application')) return;
+                if (el.tagName === 'INPUT') {
+                    var t = el.type.toLowerCase();
+                    if (t === 'checkbox' || t === 'radio') {
+                        el.checked = false;
+                    } else if (t === 'file') {
+                        try { el.value = ''; } catch (e) {}
+                    } else {
+                        el.value = '';
+                    }
+                } else if (el.tagName === 'TEXTAREA') {
+                    el.value = '';
+                } else if (el.tagName === 'SELECT') {
+                    el.selectedIndex = 0;
+                }
+            });
+
+            // Remove any server-rendered file download/delete UI blocks (they are only present
+            // when the page was rendered in edit mode). These elements have remove_* buttons
+            // or file links; remove their container nodes if found inside the modal.
+            try {
+                var jobModal = document.getElementById('jobApplicationModal');
+                if (jobModal) {
+                    var fileBlocks = jobModal.querySelectorAll('.mt-2.small.d-flex.align-items-center');
+                    fileBlocks.forEach(function(block) { block.remove(); });
+                }
+            } catch (e) { /* ignore */ }
+
+            // If application_date input exists, set to today (YYYY-MM-DD)
             var dateInput = form.querySelector('input[name="application_date"]');
-            if (dateInput && !dateInput.value) {
+            if (dateInput) {
                 var today = new Date();
                 var yyyy = today.getFullYear();
                 var mm = String(today.getMonth()+1).padStart(2,'0');

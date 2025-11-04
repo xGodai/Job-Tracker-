@@ -1,4 +1,5 @@
 {% load static %}
+{% load file_extras %}
 <!-- Dashboard Content (Included in home.html for authenticated users) -->
 <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 <div class="container py-4">
@@ -267,11 +268,14 @@
                         {{ job_application_form.cv }}
                         <div class="form-text">PDF only. Max size: 5 MB.</div>
                         {% if editing_application and editing_application.cv %}
-                            <div class="mt-2 small">
-                                <a href="{{ editing_application.cv.url }}" class="me-2" target="_blank" rel="noopener" download>Download CV</a>
-                                <label class="form-check-label ms-2">
-                                    <input type="checkbox" name="remove_cv" class="form-check-input ms-1"> Remove CV
-                                </label>
+                            <div class="mt-2 small d-flex align-items-center">
+                                <a href="{{ editing_application.cv.url }}" target="_blank" rel="noopener" download class="btn btn-sm btn-outline-secondary me-2">
+                                    <i class="fas fa-download me-1"></i>Download
+                                </a>
+                                <button type="submit" name="remove_cv" value="1" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete CV? This cannot be undone.');">
+                                    <i class="fas fa-trash-alt me-1"></i>Delete
+                                </button>
+                                <small class="text-muted ms-3">{{ editing_application.cv.name|basename }}</small>
                             </div>
                         {% endif %}
                     </div>
@@ -280,11 +284,14 @@
                         {{ job_application_form.cover_letter }}
                         <div class="form-text">PDF only. Max size: 5 MB.</div>
                         {% if editing_application and editing_application.cover_letter %}
-                            <div class="mt-2 small">
-                                <a href="{{ editing_application.cover_letter.url }}" class="me-2" target="_blank" rel="noopener" download>Download Cover Letter</a>
-                                <label class="form-check-label ms-2">
-                                    <input type="checkbox" name="remove_cover_letter" class="form-check-input ms-1"> Remove Cover Letter
-                                </label>
+                            <div class="mt-2 small d-flex align-items-center">
+                                <a href="{{ editing_application.cover_letter.url }}" target="_blank" rel="noopener" download class="btn btn-sm btn-outline-secondary me-2">
+                                    <i class="fas fa-download me-1"></i>Download
+                                </a>
+                                <button type="submit" name="remove_cover_letter" value="1" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete Cover Letter? This cannot be undone.');">
+                                    <i class="fas fa-trash-alt me-1"></i>Delete
+                                </button>
+                                <small class="text-muted ms-3">{{ editing_application.cover_letter.name|basename }}</small>
                             </div>
                         {% endif %}
                     </div>
