@@ -1,0 +1,441 @@
+{% load static %}
+<!-- Dashboard Content (Included in home.html for authenticated users) -->
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>Dashboard</h1>
+                <span class="badge bg-primary fs-6">Welcome, {% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}!</span>
+            </div>
+        </div>
+    </div>
+    <!-- Profile Edit Modal -->
+    <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="profileModalLabel"><i class="fas fa-user-edit me-2"></i>Edit Profile</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form method="post" id="profileModalForm">
+                {% csrf_token %}
+                <input type="hidden" name="update_profile" value="1">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ profile_form.username.id_for_label }}" class="form-label">
+                            <i class="fas fa-user me-1"></i>Username *
+                        </label>
+                        {{ profile_form.username }}
+                        {% if profile_form.username.errors %}
+                            <div class="text-danger small">
+                                {% for error in profile_form.username.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ profile_form.email.id_for_label }}" class="form-label">
+                            <i class="fas fa-envelope me-1"></i>Email *
+                        </label>
+                        {{ profile_form.email }}
+                        {% if profile_form.email.errors %}
+                            <div class="text-danger small">
+                                {% for error in profile_form.email.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ profile_form.first_name.id_for_label }}" class="form-label">
+                            <i class="fas fa-user me-1"></i>First Name
+                        </label>
+                        {{ profile_form.first_name }}
+                        {% if profile_form.first_name.errors %}
+                            <div class="text-danger small">
+                                {% for error in profile_form.first_name.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ profile_form.last_name.id_for_label }}" class="form-label">
+                            <i class="fas fa-user me-1"></i>Last Name
+                        </label>
+                        {{ profile_form.last_name }}
+                        {% if profile_form.last_name.errors %}
+                            <div class="text-danger small">
+                                {% for error in profile_form.last_name.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if profile_form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in profile_form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+          </div>
+          <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i>Save Changes
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cancel
+                </button>
+            </form>
+          </div>
+          </div>
+        </div>
+        </div>
+
+    <!-- Top stat cards -->
+    <div class="row mb-4">
+        <div class="col-md-6 mb-3">
+            <div class="card dashboard-card">
+                <div class="card-body text-center">
+                    <i class="fas fa-briefcase fa-2x text-info"></i>
+                    <h2 class="mt-2">{{ stats.total_applications }}</h2>
+                    <p class="text-muted">Job Applications</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <div class="card dashboard-card">
+                <div class="card-body text-center">
+                    <i class="fas fa-calendar-check fa-2x text-success"></i>
+                    <h2 class="mt-2">{{ stats.interviews_scheduled }}</h2>
+                    <p class="text-muted">Interviews Scheduled</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Targets -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card targets-card">
+                <div class="card-header">
+                    <h5 class="mb-0">Weekly Targets</h5>
+                </div>
+                <div class="card-body">
+                    <p class="small text-muted">Daily target: {{ targets.daily_target }} — Weekly target: {{ targets.weekly_target }} (resets every Monday)</p>
+
+                    <!-- Weekly targets line chart -->
+                    <div class="mb-3">
+                        <canvas id="weeklyTargetsChart" height="80"></canvas>
+                    </div>
+
+                    <!-- Safely embed the weekly chart data using json_script to avoid
+                       inline template tags inside JavaScript which confuse editors -->
+                    <script id="weekly-targets-data" type="application/json">{{ targets.weekly_chart_json|safe }}</script>
+                    <script>
+                        window._weeklyTargetsData = JSON.parse(document.getElementById('weekly-targets-data').textContent || '{}');
+                    </script>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <small>Today</small>
+                            <small>{{ targets.daily_count }} / {{ targets.daily_target }}</small>
+                        </div>
+                        <div class="progress dashboard-progress-small mt-1">
+                            <div class="progress-bar bg-light" role="progressbar" style="width:0" data-progress="{{ targets.daily_progress_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between">
+                            <small>This week (since {{ targets.week_start|date:'M d' }})</small>
+                            <small>{{ targets.weekly_count }} / {{ targets.weekly_target }}</small>
+                        </div>
+                        <div class="progress mt-1">
+                            <div class="progress-bar bg-info" role="progressbar" style="width:0" data-progress="{{ targets.weekly_progress_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+
+                    <div class="mt-2 small text-muted">Next weekly reset: {{ targets.next_reset|date:'M d, Y' }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lower stat cards -->
+    <div class="row mb-4">
+        <div class="col-md-6 mb-3">
+            <div class="card dashboard-card">
+                <div class="card-body text-center">
+                    <i class="fas fa-check-circle fa-2x text-success"></i>
+                    <h2 class="mt-2">{{ stats.interview_completed }}</h2>
+                    <p class="text-muted">Interview Completed</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <div class="card dashboard-card">
+                <div class="card-body text-center">
+                    <i class="fas fa-trophy fa-2x text-primary"></i>
+                    <h2 class="mt-2">{{ stats.offers_received }}</h2>
+                    <p class="text-muted">Offers Received</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <!-- Quick Actions card removed (moved Add Job into navbar dropdown) -->
+
+    <!-- Job Application Form (Modal) -->
+    <div class="modal fade" id="jobApplicationModal" tabindex="-1" aria-labelledby="jobApplicationModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="jobApplicationModalLabel">{% if editing_application_id %}Edit{% else %}Add{% endif %} Job Application</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+                    <div class="modal-body">
+                        <form method="post" id="jobApplicationForm" enctype="multipart/form-data">
+                {% csrf_token %}
+                {% if editing_application_id %}
+                    <input type="hidden" name="edit_job_application" value="1">
+                    <input type="hidden" name="application_id" value="{{ editing_application_id }}">
+                {% else %}
+                    <input type="hidden" name="add_job_application" value="1">
+                {% endif %}
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ job_application_form.company_name.id_for_label }}" class="form-label">Company Name *</label>
+                        {{ job_application_form.company_name }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ job_application_form.position_title.id_for_label }}" class="form-label">Position Title *</label>
+                        {{ job_application_form.position_title }}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ job_application_form.application_date.id_for_label }}" class="form-label">Application Date *</label>
+                        {{ job_application_form.application_date }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ job_application_form.status.id_for_label }}" class="form-label">Status</label>
+                        {{ job_application_form.status }}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ job_application_form.job_url.id_for_label }}" class="form-label">Job URL</label>
+                        {{ job_application_form.job_url }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ job_application_form.salary_range.id_for_label }}" class="form-label">Salary Range</label>
+                        {{ job_application_form.salary_range }}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="{{ job_application_form.location.id_for_label }}" class="form-label">Location</label>
+                    {{ job_application_form.location }}
+                </div>
+
+                <div class="mb-3">
+                    <label for="{{ job_application_form.job_description.id_for_label }}" class="form-label">Job Description</label>
+                    {{ job_application_form.job_description }}
+                </div>
+
+                <div class="mb-3">
+                    <label for="{{ job_application_form.notes.id_for_label }}" class="form-label">Notes</label>
+                    {{ job_application_form.notes }}
+                </div>
+
+                <!-- File uploads: CV and Cover Letter -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ job_application_form.cv.id_for_label }}" class="form-label">Upload CV / Resume</label>
+                        {{ job_application_form.cv }}
+                        <div class="form-text">PDF only. Max size: 5 MB.</div>
+                        {% if editing_application and editing_application.cv %}
+                            <div class="mt-2 small">
+                                <a href="{{ editing_application.cv.url }}" class="me-2" target="_blank" rel="noopener" download>Download CV</a>
+                                <label class="form-check-label ms-2">
+                                    <input type="checkbox" name="remove_cv" class="form-check-input ms-1"> Remove CV
+                                </label>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ job_application_form.cover_letter.id_for_label }}" class="form-label">Upload Cover Letter</label>
+                        {{ job_application_form.cover_letter }}
+                        <div class="form-text">PDF only. Max size: 5 MB.</div>
+                        {% if editing_application and editing_application.cover_letter %}
+                            <div class="mt-2 small">
+                                <a href="{{ editing_application.cover_letter.url }}" class="me-2" target="_blank" rel="noopener" download>Download Cover Letter</a>
+                                <label class="form-check-label ms-2">
+                                    <input type="checkbox" name="remove_cover_letter" class="form-check-input ms-1"> Remove Cover Letter
+                                </label>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <button class="btn btn-link p-0 text-decoration-none" type="button" data-bs-toggle="collapse" data-bs-target="#contactInfo" aria-expanded="false">
+                        <i class="fas fa-chevron-right me-1" id="contactToggleIcon"></i>Contact Information (Optional)
+                    </button>
+                    <div class="collapse mt-2" id="contactInfo">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ job_application_form.contact_person.id_for_label }}" class="form-label">Contact Person</label>
+                                {{ job_application_form.contact_person }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ job_application_form.contact_email.id_for_label }}" class="form-label">Contact Email</label>
+                                {{ job_application_form.contact_email }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ job_application_form.contact_phone.id_for_label }}" class="form-label">Contact Phone</label>
+                                {{ job_application_form.contact_phone }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+                        {% if editing_application_id %}
+                                <button type="submit" form="jobApplicationForm" name="delete_job_application" value="1" class="btn btn-danger me-auto" id="deleteJobBtn">Delete</button>
+                        {% endif %}
+                        <button type="submit" form="jobApplicationForm" class="btn btn-primary">{% if editing_application_id %}Update{% else %}Add{% endif %} Application</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card dashboard-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Jobs Applied</h5>
+                    <form method="get" id="jobsFilterForm" class="d-flex gap-2 align-items-center">
+                        <label class="small text-muted mb-0">Sort</label>
+                        <select name="sort" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <option value="recent" {% if active_sort == 'recent' %}selected{% endif %}>Most recent</option>
+                            <option value="alpha" {% if active_sort == 'alpha' %}selected{% endif %}>Alphabetical</option>
+                        </select>
+
+                        <label class="small text-muted mb-0">Status</label>
+                        <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <option value="all" {% if active_status == 'all' %}selected{% endif %}>All</option>
+                            {% for val,label in status_choices %}
+                                <option value="{{ val }}" {% if active_status == val %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                </div>
+                <div class="card-body">
+                    {% if job_applications %}
+                        <div class="list-group list-group-flush">
+                            {% for application in job_applications %}
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">
+                                                <i class="fas fa-briefcase me-2 text-primary"></i>
+                                                {{ application.position_title }}
+                                            </h6>
+                                            <p class="mb-1">
+                                                <strong>{{ application.company_name }}</strong>
+                                                {% if application.location %}
+                                                    <span class="text-muted"> • {{ application.location }}</span>
+                                                {% endif %}
+                                                {# remote option removed from UI #}
+                                            </p>
+                                            <small class="text-muted">
+                                                <i class="fas fa-calendar me-1"></i>
+                                                Applied on {{ application.application_date|date:"M d, Y" }}
+                                            </small>
+                                        </div>
+                                        <div class="ms-3 d-flex flex-column align-items-end">
+                                            <div class="mb-2">
+                                                {% if application.status == 'applied' %}
+                                                    <span class="badge bg-secondary">Applied</span>
+                                                {% elif application.status == 'interview_scheduled' %}
+                                                    <span class="badge bg-info text-dark">Interview Scheduled</span>
+                                                {% elif application.status == 'interview_completed' %}
+                                                    <span class="badge bg-primary">Interview Completed</span>
+                                                {% elif application.status == 'offer_received' %}
+                                                    <span class="badge bg-success">Offer Received</span>
+                                                {% elif application.status == 'rejected' %}
+                                                    <span class="badge bg-danger">Rejected</span>
+                                                {% elif application.status == 'withdrawn' %}
+                                                    <span class="badge bg-dark">Withdrawn</span>
+                                                {% else %}
+                                                    {# Fallback for legacy or unknown status values (e.g., previously 'under_review') #}
+                                                    <span class="badge bg-secondary text-dark">{{ application.get_status_display|default:application.status }}</span>
+                                                {% endif %}
+                                            </div>
+                                            <a href="?edit={{ application.id }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-edit me-1"></i>Edit
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        {% if job_applications_count > page_obj.paginator.per_page %}
+                            <div class="card-footer">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">Showing {{ page_obj.start_index }}–{{ page_obj.end_index }} of {{ job_applications_count }} matching applications</small>
+                                    <nav aria-label="Jobs pagination">
+                                        <ul class="pagination mb-0">
+                                            <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+                                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}&sort={{ active_sort }}&status={{ active_status }}" aria-label="Previous">
+                                                    &laquo;
+                                                </a>
+                                            </li>
+                                            {% for p in page_obj.paginator.page_range %}
+                                                <li class="page-item {% if page_obj.number == p %}active{% endif %}">
+                                                    <a class="page-link" href="?page={{ p }}&sort={{ active_sort }}&status={{ active_status }}">{{ p }}</a>
+                                                </li>
+                                            {% endfor %}
+                                            <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+                                                <a class="page-link" href="?page={{ page_obj.next_page_number }}&sort={{ active_sort }}&status={{ active_status }}" aria-label="Next">
+                                                    &raquo;
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No recent activity to display.</p>
+                            <p class="text-muted">Start by adding your first job application!</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dashboard data flags: template sets these to indicate the page should auto-open certain collapses -->
+<div id="dashboard-data" style="display:none" data-show-profile="{% if profile_form.errors %}1{% else %}0{% endif %}" data-show-jobapp="{% if show_job_form or job_application_form.errors %}1{% else %}0{% endif %}"></div>
+
+<!-- Load dashboard JS (handled in base.html to ensure Bootstrap is loaded first) -->
