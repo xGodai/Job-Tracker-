@@ -1,0 +1,256 @@
+/* Main custom styles for Job Search Tracker */
+
+/* Disable all animations and hover effects on cards - AGGRESSIVE OVERRIDE */
+* {
+    transition: none !important;
+    animation: none !important;
+}
+
+.card, .dashboard-card, .card-body, .card-header {
+    transition: none !important;
+    animation: none !important;
+    -webkit-transition: none !important;
+    -moz-transition: none !important;
+    -o-transition: none !important;
+    -ms-transition: none !important;
+}
+
+.card:hover, .dashboard-card:hover, .card-body:hover, .card-header:hover {
+    transform: none !important;
+    box-shadow: inherit !important;
+    transition: none !important;
+    scale: none !important;
+    translate: none !important;
+    animation: none !important;
+    -webkit-transform: none !important;
+    -moz-transform: none !important;
+    -o-transform: none !important;
+    -ms-transform: none !important;
+    filter: none !important;
+    opacity: inherit !important;
+}
+
+.navbar-brand {
+    font-weight: bold;
+}
+.main-content {
+    min-height: calc(100vh - 56px);
+    background-color: #f8f9fa;
+}
+.auth-container {
+    max-width: 400px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+}
+.dashboard-card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.navbar .btn {
+    border-radius: 20px;
+    padding: 0.375rem 1rem;
+    margin: 0 0.25rem;
+}
+.navbar .btn-outline-light:hover {
+    background-color: rgba(255,255,255,0.1);
+    border-color: white;
+}
+.min-vh-75 {
+    min-height: 75vh;
+}
+
+/* Ensure user dropdowns fit small screens: limit height and allow scrolling */
+/* Keep user dropdown scrollable on small screens */
+.user-dropdown-menu {
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Position dropdown relative to its parent using the default Bootstrap behavior */
+.navbar .nav-item.dropdown {
+    position: relative;
+}
+.navbar .user-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: auto;
+    margin-top: 0.25rem;
+    min-width: 200px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+/* Ensure brand and nav links (including the user dropdown trigger) are vertically centered
+   and sit on the same line as the brand across all breakpoints. */
+.navbar .navbar-brand,
+.navbar .nav-link {
+    display: inline-flex;
+    align-items: center;
+    padding-top: 0.375rem; /* tighten vertical padding so items align */
+    padding-bottom: 0.375rem;
+}
+
+/* Ensure the dropdown toggle (username) does not add extra vertical space */
+.navbar .nav-item.dropdown .nav-link {
+    height: auto;
+}
+
+/* If the navbar height is increased by other elements, ensure vertical centering still applies */
+.navbar .container.d-flex {
+    align-items: center;
+}
+
+/* Fix alignment on tablets and small screens (<= 768px) where some Bootstrap
+   paddings can cause the username trigger to sit off baseline. */
+@media (max-width: 768px) {
+    .navbar {
+        /* reduce extra vertical paddings that can push content */
+        padding-top: 0.25rem;
+        padding-bottom: 0.25rem;
+        min-height: 48px;
+    }
+
+    .navbar .navbar-brand {
+        padding-top: 0.25rem;
+        padding-bottom: 0.25rem;
+        line-height: 1;
+        margin-bottom: 0;
+    }
+
+    .navbar .nav-link {
+        padding-top: 0.25rem;
+        padding-bottom: 0.25rem;
+    }
+
+    /* Make sure the user trigger vertically centers inside the navbar */
+    .navbar .nav-item.dropdown {
+        display: flex;
+        align-items: center;
+    }
+
+    /* Slightly reduce icon margin so it doesn't push the trigger down */
+    .navbar .nav-link .fa-user {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+    /* Additional fine-tune: align the username trigger precisely with the brand */
+    .navbar .navbar-brand {
+        line-height: 1;
+        padding-top: 0.25rem;
+        padding-bottom: 0.25rem;
+        margin-bottom: 0;
+    }
+
+    /* Remove manual translate nudges; rely on flex vertical centering */
+}
+
+/* Make the global messages container overlay the page so alerts don't affect layout
+   (prevents leftover white bands when alerts auto-dismiss) */
+#messages-container {
+    position: fixed;
+    top: 1rem;
+    left: 0.5rem;
+    right: 0.5rem;
+    z-index: 1080; /* above most content but below modal backdrop (1090+) */
+    display: flex;
+    justify-content: center;
+    pointer-events: none; /* allow clicks to pass through except alerts */
+}
+/* Override Bootstrap primary color across the site to the requested shade */
+:root {
+    --bs-primary: #f05324;
+}
+#messages-container .alert {
+    pointer-events: auto; /* make alerts clickable/closable */
+    width: auto;
+    max-width: 980px;
+    margin: 0.25rem auto;
+}
+
+/* Make collapsed navbar behave like a right-aligned dropdown under the burger button */
+.navbar {
+    position: relative; /* anchor absolute-positioned collapse */
+}
+.navbar .navbar-collapse {
+    position: absolute;
+    top: 100%;
+    right: 0.5rem; /* align to the right edge, just below the toggler */
+    min-width: 220px;
+    background: var(--bs-primary, #f05324);
+    border-radius: 0.375rem;
+    padding: 0.5rem 0.25rem;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    display: none; /* hidden when collapsed */
+    z-index: 1085;
+}
+.navbar .navbar-collapse.show {
+    display: block; /* show when toggled */
+}
+.navbar .navbar-nav {
+    flex-direction: column; /* stack items vertically inside the dropdown */
+    align-items: flex-end; /* right-align items inside the dropdown */
+}
+.navbar .nav-link {
+    color: white; /* ensure links are readable on the primary background */
+}
+.navbar .nav-link.btn {
+    color: #212529; /* keep Sign Up button dark text when using btn styles */
+}
+
+/* Force the navbar background (full bar) to the brand orange on all screens */
+.navbar {
+    background-color: #f05324 !important;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+
+/* Toggler styles to match navbar - ensure icon is visible on the orange bar */
+.navbar .navbar-toggler {
+    border-color: rgba(255,255,255,0.2);
+}
+.navbar .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255,255,255,0.9)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+/* Make sure links stay readable on the orange background */
+.navbar .nav-link {
+    color: #fff !important;
+}
+.navbar .nav-link:hover {
+    color: #fff !important;
+    opacity: 0.95;
+}
+
+/* Make collapsed links layout with text on the left and icon on the right */
+.navbar .navbar-collapse .nav-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 200px; /* keep a stable width for the right-aligned icons inside the dropdown */
+    padding: 0.5rem 0.75rem;
+}
+.navbar .navbar-collapse .nav-link span {
+    display: inline-block;
+}
+.navbar .navbar-collapse .nav-link i {
+    flex: 0 0 auto;
+}
+
+/* Explicitly override landing page hero (uses bg-primary) to ensure the requested brand color
+   is applied even if Bootstrap or other rules override --bs-primary in some environments. */
+.container-fluid.bg-primary {
+    background-color: #f05324 !important;
+    background-image: none !important;
+}
+.container-fluid.bg-primary .btn.btn-primary {
+    background-color: #f05324 !important;
+    border-color: rgba(0,0,0,0.05) !important;
+}
+
+/* Keep the burger/collapse behavior on all screen sizes (no media-query override).
+   The collapse is positioned absolutely under the toggler so it behaves like a right-aligned
+   dropdown on every viewport. */
