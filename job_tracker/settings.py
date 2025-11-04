@@ -14,6 +14,7 @@ from pathlib import Path
 
 from django.apps import apps
 import os
+import dj_database_url
 from django.core.management.utils import get_random_secret_key
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -34,9 +35,11 @@ SECRET_KEY = (
 )
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Read DEBUG from environment so Heroku can set it to False in production.
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = []
+# Allow configuring ALLOWED_HOSTS via environment variable (space-separated)
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '127.0.0.1 localhost').split()
 
 
 # Application definition
@@ -56,6 +59,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -93,6 +97,14 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# If DATABASE_URL is set (Heroku), parse it and use the provided DB (usually Postgres)
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if DATABASE_URL:
+    DATABASES['default'] = dj_database_url.parse(DATABASE_URL, conn_max_age=600)
+
+# Honor the 'X-Forwarded-Proto' header for request.is_secure() behind proxies (Heroku)
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # Password validation
@@ -136,6 +148,9 @@ STATICFILES_DIRS = [
 # Directory where `collectstatic` will collect files for production.
 # We keep this separate from the repository (it's listed in .gitignore).
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Use WhiteNoise storage for compressed static files on Heroku
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
