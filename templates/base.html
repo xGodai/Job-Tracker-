@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
 </head>
 <body>
+    <a class="skip-link visually-hidden-focusable" href="#content">Skip to main content</a>
     <!-- Navigation -->
     <!-- Navbar uses the toggler on all screen sizes (no navbar-expand) so the burger controls
          access to all nav items on every viewport as requested. -->
@@ -81,7 +82,7 @@
     {% endif %}
 
     <!-- Main Content -->
-    <main class="main-content">
+    <main id="content" class="main-content" role="main">
         {% block content %}
         {% endblock %}
     </main>

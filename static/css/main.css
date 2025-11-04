@@ -165,6 +165,37 @@
 :root {
     --bs-primary: #f05324;
 }
+
+/* Accessibility: visible focus styles and skip-link */
+.skip-link {
+    position: absolute;
+    left: 0.5rem;
+    top: 0.5rem;
+    background: #ffffff;
+    color: #212529;
+    padding: 0.375rem 0.5rem;
+    border-radius: 0.25rem;
+    z-index: 2000;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    transform: translateY(-120%);
+    transition: transform 120ms ease-in-out;
+}
+.visually-hidden-focusable:focus,
+.skip-link:focus {
+    transform: translateY(0);
+}
+
+/* Use :focus-visible where available to avoid outlines on mouse click */
+:focus-visible {
+    outline: 3px solid rgba(37,150,190,0.85);
+    outline-offset: 2px;
+}
+
+/* Make sure interactive elements (buttons, links, inputs) have a clear focus state */
+.btn:focus-visible, .nav-link:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+    box-shadow: 0 0 0 3px rgba(37,150,190,0.15);
+    border-color: rgba(37,150,190,0.6);
+}
 #messages-container .alert {
     pointer-events: auto; /* make alerts clickable/closable */
     width: auto;
