@@ -14,6 +14,7 @@ from pathlib import Path
 
 from django.apps import apps
 import os
+import re
 import dj_database_url
 from django.core.management.utils import get_random_secret_key
 
@@ -38,8 +39,9 @@ SECRET_KEY = (
 # Read DEBUG from environment so Heroku can set it to False in production.
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
-# Allow configuring ALLOWED_HOSTS via environment variable (space-separated)
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '127.0.0.1 localhost').split()
+# Allow configuring ALLOWED_HOSTS via environment variable (comma- or space-separated)
+_allowed_hosts_raw = os.environ.get('ALLOWED_HOSTS', '127.0.0.1 localhost')
+ALLOWED_HOSTS = [h for h in re.split(r'[,\s]+', _allowed_hosts_raw) if h]
 
 
 # Application definition
