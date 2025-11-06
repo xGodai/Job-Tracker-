@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     # Local apps
     'apps.core',
     'apps.users',
+    "apps.ai_checker",
 ]
 
 MIDDLEWARE = [
