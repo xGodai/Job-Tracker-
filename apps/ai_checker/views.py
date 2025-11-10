@@ -19,15 +19,21 @@ def cv_checker(request):
 @login_required
 def cover_letter_checker(request):
     if request.method == "POST":
-        call_ai()
-        pass
+        job_description = request.POST.get('job_description')
+        cover_letter = request.FILES.get('cover_letter')
+        cover_letter_as_text = read_pdf(cover_letter)
+        feedback = call_ai(cover_letter_as_text, job_description)
+        return render(request, "cover_letter_feedback.html", {"feedback": feedback})
 
     if request.method == "GET":
         return render(request, "cover_letter_checker.html")
 
 
 def read_pdf(pdf):
-    reader = PdfReader(pdf)
+    try:
+        reader = PdfReader(pdf)
+    except Exception as e:
+        return f"an error has occured with the pdf reader {e} please contact support"
     pages = []
     text = ""
     for page in reader.pages:
@@ -42,14 +48,26 @@ def call_ai(cover_letter, job_description):
     model = "mistral-ai/mistral-small-2503"
     client = ChatCompletionsClient(endpoint=API_address, credential=AzureKeyCredential(API_key),)
 
-    response = client.complete(
-        messages=[
-            SystemMessage("here is a cover letter and the provided job description, " +
-                          "give feedback on how to improve the cover letter and give it a score out of 10"),
-            UserMessage(f"cover letter: {cover_letter} \n job description: + {job_description}")],
-        temperature=0.8,
-        top_p=0.1,
-        max_tokens=2048,
-        model=model
+    prompt = (
+        "Here is a cover letter and the job description. "
+        "Give feedback on how to improve the cover letter and give it a score out of 10.\n\n"
+        f"Cover letter:\n{cover_letter}\n\nJob description:\n{job_description}"
     )
-    return response
+    try:
+        response = client.complete(
+            messages=[
+                SystemMessage("You are an assistant that provides constructive feedback."),
+                UserMessage(prompt)],
+            temperature=0.8,
+            top_p=0.1,
+            max_tokens=2048,
+            model=model
+        )
+    except Exception as e:
+        return f"error: Something has gone wrong with the AI, {e} please contact support"
+    
+    try:
+        feedback = response.choices[0].message.content
+    except Exception:
+        feedback = str(response)
+    return feedback
