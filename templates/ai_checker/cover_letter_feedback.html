@@ -1,0 +1,22 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{% trans "Cover Letter Feedback" %}</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+</head>
+<body>
+    <div class="container">
+        <h1>{% trans "Cover Letter Feedback" %}</h1>
+
+        {% if feedback %}
+            <div class="feedback" role="status" aria-live="polite">
+                {{ feedback|linebreaksbr }}
+            </div>
+        {% else %}
+            <p class="empty">{% trans "No feedback available." %}</p>
+        {% endif %}
+    </div>
+</body>
+</html>

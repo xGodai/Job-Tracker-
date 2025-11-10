@@ -24,6 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
     path('users/', include('apps.users.urls')),
+    path("ai_tools/", include("apps.ai_checker.urls")),
 ]
 
 if settings.DEBUG:
