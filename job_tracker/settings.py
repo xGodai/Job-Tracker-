@@ -18,6 +18,7 @@ import re
 import dj_database_url
 from django.core.management.utils import get_random_secret_key
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -34,6 +35,7 @@ SECRET_KEY = (
     or os.environ.get('SECRET_KEY')
     or get_random_secret_key()
 )
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # Read DEBUG from environment so Heroku can set it to False in production.

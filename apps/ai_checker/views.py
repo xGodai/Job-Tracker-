@@ -1,10 +1,11 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from pypdf import PdfReader
-import os
 from azure.ai.inference import ChatCompletionsClient
 from azure.ai.inference.models import SystemMessage, UserMessage
 from azure.core.credentials import AzureKeyCredential
+from dotenv import load_dotenv
+import os
 
 
 @login_required
@@ -13,7 +14,7 @@ def cv_checker(request):
         # placeholder logic for AI
         pass
     if request.method == "GET":
-        return render(request, "cv_checker.html")
+        return render(request, "ai_checker/cv_checker.html")
 
 
 @login_required
@@ -23,10 +24,10 @@ def cover_letter_checker(request):
         cover_letter = request.FILES.get('cover_letter')
         cover_letter_as_text = read_pdf(cover_letter)
         feedback = call_ai(cover_letter_as_text, job_description)
-        return render(request, "cover_letter_feedback.html", {"feedback": feedback})
+        return render(request, "ai_checker/cover_letter_feedback.html", {"feedback": feedback})
 
     if request.method == "GET":
-        return render(request, "cover_letter_checker.html")
+        return render(request, "ai_checker/cover_letter_checker.html")
 
 
 def read_pdf(pdf):
@@ -43,10 +44,16 @@ def read_pdf(pdf):
 
 
 def call_ai(cover_letter, job_description):
-    API_key = os.getenv("API_KEY")
+    # Read the API key from Django settings (settings.py defines `API_key`)
+    load_dotenv()
+    API_key = os.getenv('AI_API_KEY')
+    if not API_key:
+        # Helpful runtime error if the key isn't configured
+        raise RuntimeError("AI API key is not configured. Set API_KEY in environment or settings.")
+
     API_address = "https://models.github.ai/inference"
     model = "mistral-ai/mistral-small-2503"
-    client = ChatCompletionsClient(endpoint=API_address, credential=AzureKeyCredential(API_key),)
+    client = ChatCompletionsClient(endpoint=API_address, credential=AzureKeyCredential(API_key))
 
     prompt = (
         "Here is a cover letter and the job description. "
@@ -65,7 +72,7 @@ def call_ai(cover_letter, job_description):
         )
     except Exception as e:
         return f"error: Something has gone wrong with the AI, {e} please contact support"
-    
+
     try:
         feedback = response.choices[0].message.content
     except Exception:
