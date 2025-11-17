@@ -1,37 +1,33 @@
+{% extends "base.html" %}
 {% load static %}
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>Cover Letter Checker</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-</head>
-<body>
-    <h1>Cover Letter Checker</h1>
+
+{% block title %}Cover Letter Checker{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="mb-3">Cover Letter Checker</h1>
 
     <form method="post" enctype="multipart/form-data" id="cover-letter-form" novalidate>
         {% csrf_token %}
 
-        <div class="form-group">
-            <label for="id_cover_letter">Cover letter text (required)</label>
-            <textarea name="job_description" id="id_job_description" required placeholder="Paste the job description here..">{{ cover_letter|default_if_none:"" }}</textarea>
+        <div class="mb-3">
+            <label for="id_job_description" class="form-label">Job Title & Description</label>
+            <textarea name="job_description" id="id_job_description" required class="form-control" placeholder="Paste the job description here..">{{ cover_letter|default_if_none:"" }}</textarea>
             {% if form.cover_letter.errors %}
-                <div class="error">{{ form.cover_letter.errors.as_text }}</div>
+                <div class="text-danger small">{{ form.cover_letter.errors.as_text }}</div>
             {% endif %}
         </div>
 
-        <div class="form-group">
-            <label for="id_pdf">Upload Cover letter as a pdf (required)</label>
-            <input type="file" name="cover_letter" id="id_cover_letter" accept="application/pdf" required aria-describedby="pdf-help">
-            <div id="pdf-help">Only PDF files are accepted.</div>
+        <div class="mb-3">
+            <label for="id_cover_letter" class="form-label">Upload Cover letter (PDF)</label>
+            <input type="file" name="cover_letter" id="id_cover_letter" accept="application/pdf" required aria-describedby="pdf-help" class="form-control">
+            <div id="pdf-help" class="form-text">Only PDF files are accepted.</div>
             {% if form.pdf.errors %}
-                <div class="error">{{ form.pdf.errors.as_text }}</div>
+                <div class="text-danger small">{{ form.pdf.errors.as_text }}</div>
             {% endif %}
         </div>
 
-        <button type="submit">Submit</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
     </form>
-
-
-</body>
-</html>
+</div>
+{% endblock %}
