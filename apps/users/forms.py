@@ -33,6 +33,20 @@ class CustomUserCreationForm(UserCreationForm):
             user.save()
         return user
 
+    def clean_email(self):
+        """Ensure the email is unique (case-insensitive) and provide a friendly error."""
+        email = self.cleaned_data.get('email')
+        if not email:
+            return email
+        # Check existing users with the same email (case-insensitive)
+        qs = CustomUser.objects.filter(email__iexact=email)
+        # If this form is editing an existing user, allow the same email
+        if self.instance and self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise forms.ValidationError('A user with that email address already exists.')
+        return email
+
 
 class CustomAuthenticationForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
