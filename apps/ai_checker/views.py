@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from pypdf import PdfReader
 from azure.ai.inference import ChatCompletionsClient
@@ -20,8 +21,31 @@ def cv_checker(request):
 @login_required
 def cover_letter_checker(request):
     if request.method == "POST":
-        job_description = request.POST.get('job_description')
+        job_description = (request.POST.get('job_description') or '').strip()
         cover_letter = request.FILES.get('cover_letter')
+
+        # Validate job description
+        if not job_description:
+            messages.error(request, "Job title & description is required.")
+            return render(request, "ai_checker/cover_letter_checker.html", {"job_description": job_description})
+
+        # Validate file presence
+        if not cover_letter:
+            messages.error(request, "Please upload a cover letter PDF to check.")
+            return render(request, "ai_checker/cover_letter_checker.html", {"job_description": job_description})
+
+        # Validate file type and size (5 MB limit)
+        filename = getattr(cover_letter, 'name', '')
+        content_type = getattr(cover_letter, 'content_type', '')
+        max_size = 5 * 1024 * 1024
+        if content_type != 'application/pdf' and not filename.lower().endswith('.pdf'):
+            messages.error(request, "Only PDF files are accepted for the cover letter.")
+            return render(request, "ai_checker/cover_letter_checker.html", {"job_description": job_description})
+        if getattr(cover_letter, 'size', 0) > max_size:
+            messages.error(request, "Cover letter file is too large (max 5 MB).")
+            return render(request, "ai_checker/cover_letter_checker.html", {"job_description": job_description})
+
+        # All validations passed — read PDF and call AI
         cover_letter_as_text = read_pdf(cover_letter)
         feedback = call_ai(cover_letter_as_text, job_description)
         return render(request, "ai_checker/cover_letter_feedback.html", {"feedback": feedback})

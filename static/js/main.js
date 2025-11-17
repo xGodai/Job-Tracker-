@@ -101,6 +101,77 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// Cover letter checker: show a loading spinner and disable submit to prevent double submits
+document.addEventListener('DOMContentLoaded', function() {
+    try {
+        var clForm = document.getElementById('cover-letter-form');
+        if (!clForm) return;
+        clForm.addEventListener('submit', function(e) {
+            try {
+                // Client-side validation: job description and file required
+                var jobDescEl = document.getElementById('id_job_description');
+                var fileEl = document.getElementById('id_cover_letter');
+                var jobDescVal = jobDescEl ? (jobDescEl.value || '').trim() : '';
+                var fileSelected = fileEl && fileEl.files && fileEl.files.length > 0;
+
+                // Remove any previous inline errors
+                var prevErrs = clForm.querySelectorAll('.field-error-inline');
+                prevErrs.forEach(function(node){ node.remove(); });
+
+                var hasError = false;
+                if (!jobDescVal) {
+                    var err = document.createElement('div');
+                    err.className = 'text-danger small field-error-inline';
+                    err.textContent = 'Please enter the job title & description.';
+                    jobDescEl.parentNode.appendChild(err);
+                    jobDescEl.focus();
+                    hasError = true;
+                }
+                if (!fileSelected) {
+                    var fileErr = document.createElement('div');
+                    fileErr.className = 'text-danger small field-error-inline';
+                    fileErr.textContent = 'Please upload your cover letter (PDF).';
+                    fileEl.parentNode.appendChild(fileErr);
+                    if (!hasError) fileEl.focus();
+                    hasError = true;
+                }
+                if (hasError) {
+                    e.preventDefault();
+                    return;
+                }
+
+                var submitBtn = document.getElementById('cover-letter-submit');
+                var spinner = document.getElementById('cover-letter-spinner');
+                var submitText = submitBtn && submitBtn.querySelector('.submit-text');
+                if (submitBtn) {
+                    submitBtn.setAttribute('disabled', 'disabled');
+                    submitBtn.classList.add('disabled');
+                }
+                if (submitText) submitText.textContent = 'Processing...';
+                if (spinner) spinner.classList.remove('d-none');
+                // Mark the form as busy for assistive tech
+                clForm.setAttribute('aria-busy', 'true');
+                // Also show a modal-based loading spinner if available
+                var loadingModalEl = document.getElementById('cover-letter-loading-modal');
+                if (loadingModalEl && window.bootstrap && typeof window.bootstrap.Modal === 'function') {
+                    try {
+                        var modalInstance = new bootstrap.Modal(loadingModalEl, {backdrop: 'static', keyboard: false});
+                        modalInstance.show();
+                    } catch (err) {
+                        // ignore modal show errors
+                    }
+                }
+            } catch (err) {
+                // If anything fails, allow the form to submit normally
+                console && console.error && console.error('cover letter submit handler error', err);
+            }
+            // allow the submit to proceed
+        });
+    } catch (e) {
+        console && console.error && console.error('cover letter spinner hookup failed', e);
+    }
+});
+
 // Utility: remove the messages container div if it contains no alert children
 function maybeRemoveMessagesContainer() {
     try {

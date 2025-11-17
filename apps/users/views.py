@@ -18,9 +18,18 @@ def register_view(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            # Automatically log the user in after successful registration
+            try:
+                login(request, user)
+            except Exception:
+                # If auto-login fails for any reason, fall back to redirecting to login
+                username = form.cleaned_data.get('username')
+                messages.success(request, f'Account created for {username}! You can now log in.')
+                return redirect('users:login')
+
             username = form.cleaned_data.get('username')
-            messages.success(request, f'Account created for {username}! You can now log in.')
-            return redirect('users:login')
+            messages.success(request, f'Welcome, {username}! Your account has been created and you are now logged in.')
+            return redirect('home')
     else:
         form = CustomUserCreationForm()
     
