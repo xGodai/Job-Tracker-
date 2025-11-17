@@ -108,6 +108,38 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!clForm) return;
         clForm.addEventListener('submit', function(e) {
             try {
+                // Client-side validation: job description and file required
+                var jobDescEl = document.getElementById('id_job_description');
+                var fileEl = document.getElementById('id_cover_letter');
+                var jobDescVal = jobDescEl ? (jobDescEl.value || '').trim() : '';
+                var fileSelected = fileEl && fileEl.files && fileEl.files.length > 0;
+
+                // Remove any previous inline errors
+                var prevErrs = clForm.querySelectorAll('.field-error-inline');
+                prevErrs.forEach(function(node){ node.remove(); });
+
+                var hasError = false;
+                if (!jobDescVal) {
+                    var err = document.createElement('div');
+                    err.className = 'text-danger small field-error-inline';
+                    err.textContent = 'Please enter the job title & description.';
+                    jobDescEl.parentNode.appendChild(err);
+                    jobDescEl.focus();
+                    hasError = true;
+                }
+                if (!fileSelected) {
+                    var fileErr = document.createElement('div');
+                    fileErr.className = 'text-danger small field-error-inline';
+                    fileErr.textContent = 'Please upload your cover letter (PDF).';
+                    fileEl.parentNode.appendChild(fileErr);
+                    if (!hasError) fileEl.focus();
+                    hasError = true;
+                }
+                if (hasError) {
+                    e.preventDefault();
+                    return;
+                }
+
                 var submitBtn = document.getElementById('cover-letter-submit');
                 var spinner = document.getElementById('cover-letter-spinner');
                 var submitText = submitBtn && submitBtn.querySelector('.submit-text');

@@ -12,7 +12,7 @@
 
         <div class="mb-3">
             <label for="id_job_description" class="form-label">Job Title & Description</label>
-            <textarea name="job_description" id="id_job_description" required class="form-control" placeholder="Paste the job description here..">{{ cover_letter|default_if_none:"" }}</textarea>
+            <textarea name="job_description" id="id_job_description" required class="form-control" placeholder="Paste the job description here..">{{ job_description|default_if_none:"" }}</textarea>
             {% if form.cover_letter.errors %}
                 <div class="text-danger small">{{ form.cover_letter.errors.as_text }}</div>
             {% endif %}
