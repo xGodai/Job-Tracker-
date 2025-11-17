@@ -27,7 +27,7 @@
              <ul class="navbar-nav w-100 justify-content-end">
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
+                            <a class="nav-link" href="{% url 'users:dashboard' %}" aria-label="Go to dashboard">
                                 <span>{{ user.username }}</span>
                                 <i class="fas fa-user ms-1"></i>
                             </a>
