@@ -8,6 +8,8 @@ class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=True)
     first_name = forms.CharField(max_length=30, required=False)
     last_name = forms.CharField(max_length=30, required=False)
+    # Restrict username length on the registration form to 25 characters
+    username = forms.CharField(max_length=25)
     
     class Meta:
         model = CustomUser
@@ -18,6 +20,9 @@ class CustomUserCreationForm(UserCreationForm):
         # Add CSS classes for styling
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
+        # Ensure the username input has a maxlength attribute for client-side enforcement
+        if 'username' in self.fields:
+            self.fields['username'].widget.attrs['maxlength'] = '25'
     
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -47,3 +52,6 @@ class ProfileUpdateForm(forms.ModelForm):
         # Add CSS classes for styling
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
+        # Match the client-side maxlength for username when updating profile
+        if 'username' in self.fields:
+            self.fields['username'].widget.attrs['maxlength'] = '25'
