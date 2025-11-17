@@ -203,25 +203,40 @@
     margin: 0.25rem auto;
 }
 
-/* Make collapsed navbar behave like a right-aligned dropdown under the burger button */
 .navbar {
     position: relative; /* anchor absolute-positioned collapse */
 }
+
+/* Anchor the collapse to the inner container so it aligns under the brand
+   and respects the page's container width. This keeps the dropdown behaviour
+   consistent on all viewport sizes. */
+.navbar .container {
+    position: relative;
+}
+
 .navbar .navbar-collapse {
     position: absolute;
-    top: 100%;
-    right: 0.5rem; /* align to the right edge, just below the toggler */
+    /* place it just under the navbar bar with a small gap */
+    top: calc(100% + 0.25rem);
+    right: 0.5rem;
+    left: auto;
     min-width: 220px;
+    max-width: 360px; /* prevent it from growing too wide on large screens */
+    width: auto;
     background: var(--bs-primary, #f05324);
     border-radius: 0.375rem;
     padding: 0.5rem 0.25rem;
     box-shadow: 0 6px 20px rgba(0,0,0,0.12);
     display: none; /* hidden when collapsed */
     z-index: 1085;
+    transform-origin: top right;
+    pointer-events: auto;
 }
+
 .navbar .navbar-collapse.show {
     display: block; /* show when toggled */
 }
+
 .navbar .navbar-nav {
     flex-direction: column; /* stack items vertically inside the dropdown */
     align-items: flex-end; /* right-align items inside the dropdown */
