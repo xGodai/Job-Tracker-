@@ -15,7 +15,7 @@
 8. [Tools](#tools)
 9. [Acknowledgments](#acknowledgements)
 
-# Features
+# Features -
 
 Below is a concise list of the application's main features with short explanations.
 
@@ -32,7 +32,7 @@ Below is a concise list of the application's main features with short explanatio
 - **Email- and DB-safe Registration:** Registration validates email uniqueness at the form level to prevent database integrity errors and improve UX.
 - **Progress Tracking & Visuals:** Visual progress indicators and optional charts (Chart.js) on the dashboard help users see application activity at a glance.
 
-# User Stories
+# User Stories -
 
 Below are concise user stories in the format "As a <role>, I want <goal> so that <reason>", with brief acceptance criteria.
 
@@ -60,56 +60,11 @@ Below are concise user stories in the format "As a <role>, I want <goal> so that
 - **As an administrator, I want to run migrations and create a superuser in production so that I can manage the site.**
 	- Acceptance: migrations run without error on production and a superuser can log into Django admin.
 
-# UX Design
+# UX Design -
 
-This section documents the UX approach used in the application: core goals, main screens, component behavior, accessibility considerations, and common interaction patterns.
-
-## Design Goals
-- Minimize onboarding friction (auto-login after registration).
-- Keep primary actions discoverable from the dashboard (Add Job, file actions, Cover Letter Checker).
-- Make AI feedback explicit and explainable (clear inputs, processing state, and readable output).
-- Prioritize accessibility and mobile-first responsiveness.
-
-## Information Architecture
-- **Top nav:** brand, Add Job, Cover Letter Checker, account actions (Dashboard/Profile/Logout).
-- **Dashboard:** primary workspace showing job applications, filters, quick-add CTA, and visual summaries (progress bar / charts).
-- **Application detail / modal:** fields for company, role, date, status, notes, and file uploads (CV/cover letter).
-- **Cover Letter Checker:** small focused flow: job title & description + PDF upload → processing modal → feedback screen.
-
-## Major Screens & Components
-- **Navbar:** collapsible on small screens; includes a visible skip link and clear account access.
-- **Dashboard:** list or grid of application cards with summary metadata, status badges, and file action icons.
-- **Add/Edit Job Modal:** compact form with client validation; returns to dashboard on success.
-- **File controls:** show filename, Download and Delete actions; provide a confirmation or undo pattern for deletes.
-- **Cover Letter Checker UI:** input area for job details, file uploader (PDF-only), submit button, inline spinner, and an accessible loading modal while AI runs.
-- **Alerts & Inline Errors:** dismissible top-level alerts for global messages and small inline text for field errors.
-
-## Interaction Patterns
-- **Single-click file actions:** Download directly downloads; Delete confirms or offers simple undo.
-- **Modals:** trap focus while open and restore focus to the originating control on close.
-- **Cover letter submission:** disable the submit control on click, show a spinner and modal overlay, and set `aria-busy` for assistive tech.
-- **Form validation:** client-side checks for required fields and file types; server-side validation as authoritative.
-
-## Accessibility
-- Include a keyboard-accessible skip link to jump to main content.
-- Use `:focus-visible` and clear focus outlines to support keyboard users.
-- Associate error text with fields via `aria-describedby` and provide `role="alert"` for live messages.
-
-## Responsive Behavior
-- Design mobile-first: stack content and use collapsible navigation on narrow viewports.
-- Ensure touch targets meet size recommendations and important actions are reachable without excessive scrolling.
-
-## Visual Language
-- Primary brand color used for the navbar and progress accents; neutral surfaces for cards and panels.
-- Typography emphasizes readability with clear hierarchy for headings, labels, and body text.
-
-## Error States & Edge Cases
-- Show inline validation errors for missing job description or missing file during AI check.
-- Provide a friendly global error if the AI service fails and include retry instructions.
-
-## Future UX Opportunities
-- Inline AI suggestions with highlighted spans and example rewrites.
-- Drag-and-drop file upload on desktop.
+## Wireframes
+## Color Scheme
+## Fonts:
 
 # Tech Stack
 
@@ -126,9 +81,29 @@ This project uses a standard Django-based stack with modern frontend tooling and
 - **Deployment**: Heroku + gunicorn; `Procfile`, `.python-version`, and pinned `requirements.txt` are included for reproducible deployments.
 - **Other notable packages**: `pypdf` for PDF parsing, `python-dotenv` for local environment management, and `psycopg2-binary` for Postgres connectivity.
 
- 
+ # Datebase -
+ ## Core Entities 
+
+# Testing -
+
+## Automated
+## Lighthouse
+## HTML Validation
+## CSS Validation
+## PEP8 Validation
 
 
+# AI
+## Cover Letter Checking
+## Development & Code Generation
+## Future AI Intergrations
+## Ethical AI Usage
+## AI Tools & Technologies
+## Benefits Achieved
+
+# Tools Used
+
+# Acknowledgements
 
 
 

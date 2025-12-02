@@ -25,8 +25,13 @@ class JobApplicationForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Add CSS classes for styling
+        # Add CSS classes and IDs for styling and accessibility
         for field_name, field in self.fields.items():
+            # Set explicit ID for proper label association
+            field.widget.attrs['id'] = f'id_{field_name}'
+            # Clear help_text to prevent aria-describedby from being added
+            field.help_text = ''
+            
             if isinstance(field.widget, forms.CheckboxInput):
                 field.widget.attrs['class'] = 'form-check-input'
             elif isinstance(field.widget, forms.Select):
@@ -42,7 +47,7 @@ class JobApplicationForm(forms.ModelForm):
         self.fields['job_url'].widget.attrs['placeholder'] = 'https://...'
         self.fields['contact_person'].widget.attrs['placeholder'] = 'e.g., John Smith (HR Manager)'
         self.fields['contact_email'].widget.attrs['placeholder'] = 'recruiter@company.com'
-        self.fields['contact_phone'].widget.attrs['placeholder'] = '+1 (555) 123-4567'
+        self.fields['contact_phone'].widget.attrs['placeholder'] = '+44 1234 567890'
         self.fields['salary_range'].widget.attrs['placeholder'] = 'e.g., £40,000 - £55,000'
         self.fields['location'].widget.attrs['placeholder'] = 'e.g., New York, NY or Remote'
         self.fields['notes'].widget.attrs['placeholder'] = 'Any additional notes or thoughts about this application...'
