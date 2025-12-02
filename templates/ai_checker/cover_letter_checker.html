@@ -13,7 +13,7 @@
         <div class="mb-3">
             <label for="id_job_description" class="form-label">Job Title & Description</label>
             <textarea name="job_description" id="id_job_description" required class="form-control" placeholder="Paste the job description here..">{{ job_description|default_if_none:"" }}</textarea>
-            {% if form.cover_letter.errors %}
+            {% if form and form.cover_letter.errors %}
                 <div class="text-danger small">{{ form.cover_letter.errors.as_text }}</div>
             {% endif %}
         </div>
@@ -22,7 +22,7 @@
             <label for="id_cover_letter" class="form-label">Upload Cover letter (PDF)</label>
             <input type="file" name="cover_letter" id="id_cover_letter" accept="application/pdf" required aria-describedby="pdf-help" class="form-control">
             <div id="pdf-help" class="form-text">Only PDF files are accepted.</div>
-            {% if form.pdf.errors %}
+            {% if form and form.pdf.errors %}
                 <div class="text-danger small">{{ form.pdf.errors.as_text }}</div>
             {% endif %}
         </div>
@@ -43,5 +43,109 @@
                 </div>
             </div>
         </div>
+    
+    <!-- Profile Edit Modal (copied from dashboard so navbar Edit Profile works here) -->
+    <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="profileModalLabel"><i class="fas fa-user-edit me-2"></i>Edit Profile</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form method="post" id="profileModalForm">
+                {% csrf_token %}
+                <input type="hidden" name="update_profile" value="1">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ profile_form.username.id_for_label }}" class="form-label">
+                            <i class="fas fa-user me-1"></i>Username *
+                        </label>
+                        {{ profile_form.username }}
+                        {% if profile_form.username.errors %}
+                            <div class="text-danger small">
+                                {% for error in profile_form.username.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ profile_form.email.id_for_label }}" class="form-label">
+                            <i class="fas fa-envelope me-1"></i>Email *
+                        </label>
+                        {{ profile_form.email }}
+                        {% if profile_form.email.errors %}
+                            <div class="text-danger small">
+                                {% for error in profile_form.email.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ profile_form.first_name.id_for_label }}" class="form-label">
+                            <i class="fas fa-user me-1"></i>First Name
+                        </label>
+                        {{ profile_form.first_name }}
+                        {% if profile_form.first_name.errors %}
+                            <div class="text-danger small">
+                                {% for error in profile_form.first_name.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ profile_form.last_name.id_for_label }}" class="form-label">
+                            <i class="fas fa-user me-1"></i>Last Name
+                        </label>
+                        {{ profile_form.last_name }}
+                        {% if profile_form.last_name.errors %}
+                            <div class="text-danger small">
+                                {% for error in profile_form.last_name.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if profile_form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in profile_form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+          </div>
+          <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i>Save Changes
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cancel
+                </button>
+            </form>
+          </div>
+          </div>
+        </div>
+        </div>
+
+    {% if profile_form and profile_form.errors %}
+    <script>
+    document.addEventListener('DOMContentLoaded', function(){
+        try {
+            var modalEl = document.getElementById('profileModal');
+            if (modalEl && window.bootstrap && typeof window.bootstrap.Modal === 'function') {
+                new window.bootstrap.Modal(modalEl).show();
+            }
+        } catch (e) {
+            console && console.error && console.error('profile modal open error', e);
+        }
+    });
+    </script>
+    {% endif %}
 </div>
 {% endblock %}
