@@ -190,3 +190,5 @@ if os.environ.get('CLOUDINARY_CLOUD_NAME') and os.environ.get('CLOUDINARY_API_KE
     # Media URL is provided by Cloudinary storage backend; keep fallback
     MEDIA_URL = '/media/'
 
+#AMIResponsive
+X_FRAME_OPTIONS = 'SAMEORIGIN'
