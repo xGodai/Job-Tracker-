@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
-from django.apps import apps
 import os
 import re
 import dj_database_url
@@ -143,7 +142,6 @@ USE_I18N = True
 USE_TZ = True
 
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 STATIC_URL = 'static/'
@@ -178,7 +176,9 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Cloudinary, set the following environment variables in your deployment or local
 # environment: CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET.
 # When present, we switch Django's default file storage to Cloudinary's storage.
-if os.environ.get('CLOUDINARY_CLOUD_NAME') and os.environ.get('CLOUDINARY_API_KEY') and os.environ.get('CLOUDINARY_API_SECRET'):
+if (os.environ.get('CLOUDINARY_CLOUD_NAME') and
+        os.environ.get('CLOUDINARY_API_KEY') and
+        os.environ.get('CLOUDINARY_API_SECRET')):
     # Use django-cloudinary-storage backend. Requires installing `cloudinary` and
     # `django-cloudinary-storage` (see requirements.txt and CLOUDINARY.md instructions).
     CLOUDINARY_STORAGE = {
@@ -190,5 +190,5 @@ if os.environ.get('CLOUDINARY_CLOUD_NAME') and os.environ.get('CLOUDINARY_API_KE
     # Media URL is provided by Cloudinary storage backend; keep fallback
     MEDIA_URL = '/media/'
 
-#AMIResponsive
+# AMIResponsive
 X_FRAME_OPTIONS = 'ALLOWALL'

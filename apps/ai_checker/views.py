@@ -46,14 +46,22 @@ def cover_letter_checker(request):
             # ensure profile_form exists for template
             if profile_form is None:
                 profile_form = ProfileUpdateForm(instance=request.user)
-            return render(request, "ai_checker/cover_letter_checker.html", {"job_description": job_description, "profile_form": profile_form})
+            return render(
+                request,
+                "ai_checker/cover_letter_checker.html",
+                {"job_description": job_description, "profile_form": profile_form}
+            )
 
         # Validate file presence
         if not cover_letter:
             messages.error(request, "Please upload a cover letter PDF to check.")
             if profile_form is None:
                 profile_form = ProfileUpdateForm(instance=request.user)
-            return render(request, "ai_checker/cover_letter_checker.html", {"job_description": job_description, "profile_form": profile_form})
+            return render(
+                request,
+                "ai_checker/cover_letter_checker.html",
+                {"job_description": job_description, "profile_form": profile_form}
+            )
 
         # Validate file type and size (5 MB limit)
         filename = getattr(cover_letter, 'name', '')
@@ -63,12 +71,20 @@ def cover_letter_checker(request):
             messages.error(request, "Only PDF files are accepted for the cover letter.")
             if profile_form is None:
                 profile_form = ProfileUpdateForm(instance=request.user)
-            return render(request, "ai_checker/cover_letter_checker.html", {"job_description": job_description, "profile_form": profile_form})
+            return render(
+                request,
+                "ai_checker/cover_letter_checker.html",
+                {"job_description": job_description, "profile_form": profile_form}
+            )
         if getattr(cover_letter, 'size', 0) > max_size:
             messages.error(request, "Cover letter file is too large (max 5 MB).")
             if profile_form is None:
                 profile_form = ProfileUpdateForm(instance=request.user)
-            return render(request, "ai_checker/cover_letter_checker.html", {"job_description": job_description, "profile_form": profile_form})
+            return render(
+                request,
+                "ai_checker/cover_letter_checker.html",
+                {"job_description": job_description, "profile_form": profile_form}
+            )
 
         # All validations passed — read PDF and call AI
         cover_letter_as_text = read_pdf(cover_letter)
@@ -78,7 +94,11 @@ def cover_letter_checker(request):
     # GET: initialize a profile form for the modal
     if profile_form is None:
         profile_form = ProfileUpdateForm(instance=request.user)
-    return render(request, "ai_checker/cover_letter_checker.html", {"job_description": "", "profile_form": profile_form})
+    return render(
+        request,
+        "ai_checker/cover_letter_checker.html",
+        {"job_description": "", "profile_form": profile_form}
+    )
 
 
 def read_pdf(pdf):
