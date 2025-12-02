@@ -26,15 +26,15 @@ class AuthViewTests(TestCase):
             email='test@example.com',
             password='testpass123'
         )
-    
+
     def test_register_view(self):
         response = self.client.get(reverse('users:register'))
         self.assertEqual(response.status_code, 200)
-    
+
     def test_login_view(self):
         response = self.client.get(reverse('users:login'))
         self.assertEqual(response.status_code, 200)
-    
+
     def test_user_login(self):
         response = self.client.post(reverse('users:login'), {
             'username': 'testuser',

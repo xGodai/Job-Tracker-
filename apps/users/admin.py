@@ -9,7 +9,7 @@ class CustomUserAdmin(UserAdmin):
     list_filter = ('is_job_seeker', 'is_staff', 'is_superuser', 'is_active', 'date_joined')
     search_fields = ('username', 'email', 'first_name', 'last_name')
     ordering = ('-date_joined',)
-    
+
     fieldsets = UserAdmin.fieldsets + (
         ('Additional Info', {'fields': ('is_job_seeker',)}),
     )

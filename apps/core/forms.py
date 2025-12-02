@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 
 class JobApplicationForm(forms.ModelForm):
     """Form for creating and updating job applications"""
-    
+
     class Meta:
         model = JobApplication
         fields = [
@@ -22,11 +22,16 @@ class JobApplicationForm(forms.ModelForm):
             'cv': forms.FileInput(attrs={'accept': 'application/pdf,.pdf'}),
             'cover_letter': forms.FileInput(attrs={'accept': 'application/pdf,.pdf'}),
         }
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Add CSS classes for styling
+        # Add CSS classes and IDs for styling and accessibility
         for field_name, field in self.fields.items():
+            # Set explicit ID for proper label association
+            field.widget.attrs['id'] = f'id_{field_name}'
+            # Clear help_text to prevent aria-describedby from being added
+            field.help_text = ''
+
             if isinstance(field.widget, forms.CheckboxInput):
                 field.widget.attrs['class'] = 'form-check-input'
             elif isinstance(field.widget, forms.Select):
@@ -35,14 +40,14 @@ class JobApplicationForm(forms.ModelForm):
                 # For file inputs we want the plain input appearance; Bootstrap's
                 # file input works with form-control in many setups, keep it consistent.
                 field.widget.attrs['class'] = field.widget.attrs.get('class', '') + ' form-control'
-        
+
         # Set placeholders for better UX
         self.fields['company_name'].widget.attrs['placeholder'] = 'e.g., Google, Microsoft, Startup Inc.'
         self.fields['position_title'].widget.attrs['placeholder'] = 'e.g., Software Engineer, Data Scientist'
         self.fields['job_url'].widget.attrs['placeholder'] = 'https://...'
         self.fields['contact_person'].widget.attrs['placeholder'] = 'e.g., John Smith (HR Manager)'
         self.fields['contact_email'].widget.attrs['placeholder'] = 'recruiter@company.com'
-        self.fields['contact_phone'].widget.attrs['placeholder'] = '+1 (555) 123-4567'
+        self.fields['contact_phone'].widget.attrs['placeholder'] = '+44 1234 567890'
         self.fields['salary_range'].widget.attrs['placeholder'] = 'e.g., £40,000 - £55,000'
         self.fields['location'].widget.attrs['placeholder'] = 'e.g., New York, NY or Remote'
         self.fields['notes'].widget.attrs['placeholder'] = 'Any additional notes or thoughts about this application...'

@@ -1,6 +1,5 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth import authenticate
 from .models import CustomUser
 
 
@@ -10,20 +9,24 @@ class CustomUserCreationForm(UserCreationForm):
     last_name = forms.CharField(max_length=30, required=False)
     # Restrict username length on the registration form to 25 characters
     username = forms.CharField(max_length=25)
-    
+
     class Meta:
         model = CustomUser
         fields = ('username', 'email', 'first_name', 'last_name', 'password1', 'password2')
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Add CSS classes for styling
+        # Add CSS classes and IDs for styling and accessibility
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
+            field.widget.attrs['id'] = f'id_{field_name}'
+            # Clear help_text to prevent aria-describedby from being added
+            # (since we're not rendering help text in templates)
+            field.help_text = ''
         # Ensure the username input has a maxlength attribute for client-side enforcement
         if 'username' in self.fields:
             self.fields['username'].widget.attrs['maxlength'] = '25'
-    
+
     def save(self, commit=True):
         user = super().save(commit=False)
         user.email = self.cleaned_data['email']
@@ -51,21 +54,27 @@ class CustomUserCreationForm(UserCreationForm):
 class CustomAuthenticationForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Add CSS classes for styling
+        # Add CSS classes and IDs for styling and accessibility
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
+            field.widget.attrs['id'] = f'id_{field_name}'
+            # Clear help_text to prevent aria-describedby from being added
+            field.help_text = ''
 
 
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = CustomUser
         fields = ('username', 'email', 'first_name', 'last_name')
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Add CSS classes for styling
+        # Add CSS classes and IDs for styling and accessibility
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
+            field.widget.attrs['id'] = f'id_{field_name}'
+            # Clear help_text to prevent aria-describedby from being added
+            field.help_text = ''
         # Match the client-side maxlength for username when updating profile
         if 'username' in self.fields:
             self.fields['username'].widget.attrs['maxlength'] = '25'

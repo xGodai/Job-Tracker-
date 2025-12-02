@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
 from apps.users.forms import ProfileUpdateForm
 from apps.core.forms import JobApplicationForm
 from apps.core.models import JobApplication
@@ -19,13 +18,13 @@ def home(request):
     if not request.user.is_authenticated:
         # Show landing page for unauthenticated users
         return render(request, 'home.html')
-    
+
     # Dashboard logic for authenticated users
     profile_form = None
     job_application_form = None
     editing_application_id = None
     show_job_form = False
-    
+
     if request.method == 'POST':
         # Delete a job application (from the edit modal)
         if 'delete_job_application' in request.POST:
@@ -43,7 +42,11 @@ def home(request):
             except Exception:
                 pass
             application.delete()
-            messages.success(request, f'Job application for {application.position_title} at {application.company_name} has been deleted.')
+            messages.success(
+                request,
+                f'Job application for {application.position_title} at '
+                f'{application.company_name} has been deleted.'
+            )
             return redirect('home')
 
         if 'update_profile' in request.POST:
@@ -61,7 +64,11 @@ def home(request):
                     job_application.application_date = date.today()
                 job_application.user = request.user
                 job_application.save()
-                messages.success(request, f'Job application for {job_application.position_title} at {job_application.company_name} has been added!')
+                messages.success(
+                    request,
+                    f'Job application for {job_application.position_title} at '
+                    f'{job_application.company_name} has been added!'
+                )
                 return redirect('home')
             else:
                 # show the job application form again with validation errors
@@ -89,12 +96,16 @@ def home(request):
                             pass
                     job_application.cover_letter = None
                 job_application.save()
-                messages.success(request, f'Job application for {application.position_title} at {application.company_name} has been updated!')
+                messages.success(
+                    request,
+                    f'Job application for {application.position_title} at '
+                    f'{application.company_name} has been updated!'
+                )
                 return redirect('home')
             else:
                 editing_application_id = application_id
                 show_job_form = True
-    
+
     # Check if we're editing an existing application or opening a new blank form
     if request.GET.get('edit'):
         application_id = request.GET.get('edit')
@@ -108,17 +119,26 @@ def home(request):
         job_application_form = JobApplicationForm(initial={'application_date': date.today()})
         editing_application_id = None
         show_job_form = True
-    
+
     # Initialize forms if not set by POST processing
     if profile_form is None:
         profile_form = ProfileUpdateForm(instance=request.user)
     if job_application_form is None:
         job_application_form = JobApplicationForm()
-    
-    return render(request, 'home.html', get_dashboard_context(request, profile_form, job_application_form, editing_application_id, show_job_form))
+
+    return render(
+        request,
+        'home.html',
+        get_dashboard_context(
+            request, profile_form, job_application_form,
+            editing_application_id, show_job_form
+        )
+    )
 
 
-def get_dashboard_context(request, profile_form, job_application_form, editing_application_id=None, show_job_form=False):
+def get_dashboard_context(
+        request, profile_form, job_application_form,
+        editing_application_id=None, show_job_form=False):
     """Helper function to get dashboard context for authenticated users"""
     # Get user's job applications for dashboard stats
     job_applications_qs = request.user.job_applications.all()
@@ -213,7 +233,7 @@ def get_dashboard_context(request, profile_form, job_application_form, editing_a
     # Also provide a JSON string so templates that don't have json_script
     # can safely embed the data in a <script type="application/json"> tag.
     targets['weekly_chart_json'] = json.dumps(targets['weekly_chart_data'])
-    
+
     # Pass available status choices for the filter UI
     status_choices = JobApplication.STATUS_CHOICES
 
@@ -224,7 +244,10 @@ def get_dashboard_context(request, profile_form, job_application_form, editing_a
         'user': request.user,
         'profile_form': profile_form,
         'job_application_form': job_application_form,
-        'editing_application': get_object_or_404(JobApplication, id=editing_application_id, user=request.user) if editing_application_id else None,
+        'editing_application': (
+            get_object_or_404(JobApplication, id=editing_application_id, user=request.user)
+            if editing_application_id else None
+        ),
         'job_applications': page_obj,  # paginated page object (iterable)
         'page_obj': page_obj,
         'paginator': paginator,

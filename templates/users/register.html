@@ -86,9 +86,6 @@
                         {% endfor %}
                     </div>
                 {% endif %}
-                {% if form.password1.help_text %}
-                    <div class="form-text">{{ form.password1.help_text }}</div>
-                {% endif %}
             </div>
 
             <div class="mb-3">
@@ -102,9 +99,6 @@
                             {{ error }}
                         {% endfor %}
                     </div>
-                {% endif %}
-                {% if form.password2.help_text %}
-                    <div class="form-text">{{ form.password2.help_text }}</div>
                 {% endif %}
             </div>
 

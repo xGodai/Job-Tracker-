@@ -45,15 +45,15 @@
         </div>
     
     <!-- Profile Edit Modal (copied from dashboard so navbar Edit Profile works here) -->
-    <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+    <div class="modal fade" id="profileModal" tabindex="-1" role="dialog" aria-labelledby="profileModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="profileModalLabel"><i class="fas fa-user-edit me-2"></i>Edit Profile</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <div class="modal-body">
             <form method="post" id="profileModalForm">
+          <div class="modal-body">
                 {% csrf_token %}
                 <input type="hidden" name="update_profile" value="1">
                 <div class="row">
@@ -127,25 +127,15 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times me-1"></i>Cancel
                 </button>
-            </form>
           </div>
+            </form>
           </div>
         </div>
         </div>
 
     {% if profile_form and profile_form.errors %}
-    <script>
-    document.addEventListener('DOMContentLoaded', function(){
-        try {
-            var modalEl = document.getElementById('profileModal');
-            if (modalEl && window.bootstrap && typeof window.bootstrap.Modal === 'function') {
-                new window.bootstrap.Modal(modalEl).show();
-            }
-        } catch (e) {
-            console && console.error && console.error('profile modal open error', e);
-        }
-    });
-    </script>
+    <div data-open-profile-modal="true" style="display:none;"></div>
+    <script src="{% static 'js/profile-modal.js' %}"></script>
     {% endif %}
 </div>
 {% endblock %}

@@ -2,18 +2,15 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
-from django.conf import settings
-from .forms import CustomUserCreationForm, CustomAuthenticationForm, ProfileUpdateForm
-from apps.core.forms import JobApplicationForm
+from .forms import CustomUserCreationForm, CustomAuthenticationForm
 
 
 def register_view(request):
     """User registration view"""
     if request.user.is_authenticated:
         return redirect('home')
-    
+
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
@@ -32,7 +29,7 @@ def register_view(request):
             return redirect('home')
     else:
         form = CustomUserCreationForm()
-    
+
     return render(request, 'users/register.html', {'form': form})
 
 
@@ -40,7 +37,7 @@ def login_view(request):
     """User login view"""
     if request.user.is_authenticated:
         return redirect('home')
-    
+
     if request.method == 'POST':
         form = CustomAuthenticationForm(request, data=request.POST)
         if form.is_valid():
@@ -57,7 +54,7 @@ def login_view(request):
                 return redirect('home')
     else:
         form = CustomAuthenticationForm()
-    
+
     return render(request, 'users/login.html', {'form': form})
 
 

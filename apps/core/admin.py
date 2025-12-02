@@ -9,7 +9,7 @@ class JobApplicationAdmin(admin.ModelAdmin):
     search_fields = ('position_title', 'company_name', 'user__username', 'user__email')
     date_hierarchy = 'application_date'
     ordering = ('-application_date', '-created_at')
-    
+
     fieldsets = (
         ('Basic Information', {
             'fields': ('user', 'company_name', 'position_title', 'application_date', 'status')

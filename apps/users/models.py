@@ -12,13 +12,13 @@ class CustomUser(AbstractUser):
     last_name = models.CharField(max_length=30, blank=True)
     is_job_seeker = models.BooleanField(default=True)
     date_joined = models.DateTimeField(auto_now_add=True)
-    
+
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
-    
+
     def __str__(self):
         return self.username
-    
+
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}".strip()
