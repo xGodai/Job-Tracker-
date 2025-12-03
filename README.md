@@ -256,6 +256,7 @@ These validation steps are part of the continuous integration and quality assura
 ## Acknowledgements
 
 **Django Community** for the excellent Web Framework
+
 **Bootstrap Team** for the responsive CSS Framework
 
-
+**GenericName192** for implemneting AI Cover Letter Checker
